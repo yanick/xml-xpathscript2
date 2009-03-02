@@ -1,0 +1,112 @@
+for elements:
+
+pre
+<tag>              # displayed if showtag == 1
+intro
+prechildren        # displayed if <tag> has children
+prechild           # displayed before each child
+[ child node ]
+postchild          # displayed after each child
+postchildren       # displayed if <tag> has children
+extro
+</tag>             # displayed if showtag == 1
+post
+
+showtag
+action
+testcode
+rename
+content
+insteadofchildren
+
+for text
+
+pre
+filter
+replace
+post
+action    # can be a string or a sub, no interpolation
+testcode
+
+content
+
+for comment
+
+pre
+filter
+replace
+post
+action
+testcode
+
+content
+
+rename 
+showtag
+
+
+for document
+pre
+post
+testcode
+
+content
+
+
+calls
+
+
+$stylesheet->transform( $node, as => 'mytag' );
+
+$styletsheet->set( '#text' => {
+        pre => '=====>',
+        filter => sub { s/foo/bar/g; },
+        post => sub { 
+            $node, $stylesheet, $trans
+            $node->post; 
+            return "foo"; 
+        },
+} );
+
+
+Have a $stylesheet->make_interpolation_explicit for hard-coding
+
+interpolation is off by default
+
+default interpolation form => { }
+
+
+--------------------
+
+$stylesheet->set( 'foo' => { ... } );
+
+is same than
+
+$element->set(
+    pre => "ddd",
+    post => "eee",
+);
+
+
+-------------------------------------
+
+pre can be
+
+A string =>  interpolated if interpolation is on
+
+A sub ref => execute and take the result as the string
+    to put in there, interpolated
+
+-------------------------------------------
+
+if an attribute of the transformator is modified within
+a transformation, the trans is deconnected from the stylesheet
+unless $trans->make_change_global
+
+--------------------
+
+$stylesheet->transform( 
+    $node,
+    as => 'otherElement',
+    args => [ one => 2 ],
+);

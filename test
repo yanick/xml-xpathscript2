@@ -1,0 +1,55 @@
+use Test::More qw/ no_plan /;
+
+use XML::LibXML;
+
+my $parser = XML::LibXML->new;
+
+my $dom = $parser->parse_string( <<'XML' );
+<doc xmlns:baz="http://whatever">
+    <foo>hi there</foo>
+    <bar>bye bye</bar>
+    <baz:gluck  googoo="gaga"  >waka</baz:gluck>
+    <a xmlns:b="http://somewhere">waka</a>
+</doc>
+XML
+
+my ( $node ) =  $dom->findnodes( '//baz:gluck' );
+
+use XML::XPathScript2::Stylesheet::Element;
+
+my $tag = XML::XPathScript2::Stylesheet::Element->new(
+    showtag => 1,
+);
+
+#is $tag->transform( $node ), '<baz:gluck googoo="gaga"></baz:gluck>';
+
+( $node ) = $dom->findnodes( '//a' );
+
+#is $tag->transform( $node ), '<a xmlns:b="http://somewhere"></a>';
+
+use XML::XPathScript2::Stylesheet;
+use XML::XPathScript2::Stylesheet::Text;
+
+my $ss = XML::XPathScript2::Stylesheet->new;
+$tag->set_stylesheet( $ss );
+$tag->set_pre( "before the foo:" );
+$tag->set_post( sub { return ":after the foo" } );
+$ss->set_text( 
+    XML::XPathScript2::Stylesheet::Text->new( 
+        stylesheet => $ss,
+        filter => sub { s/i/X/g; },
+    )
+);
+
+$ss->set_element( 'foo' => $tag );
+
+( $node ) = $dom->findnodes( '//foo' );
+
+is $ss->transform( $node, $tag ), '';
+
+$tag->set_interpolation(1);
+$tag->set_pre( '{text()}' );
+
+is $ss->transform( $node, $tag ), '';
+
+
