@@ -1,0 +1,9 @@
+
+how it should work:
+
+my $template = XML::XPathScript2::Template->new( file => 'template.xps' );
+                                                 string => '...'
+
+print $template->as_string;
+    $template->as_sub;
+    $template->as_module;

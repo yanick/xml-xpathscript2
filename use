@@ -1,0 +1,14 @@
+new stylesheet
+
+
+package XML::XPathScript2::Stylesheet::Pod2DocBook;
+
+use Moose;
+
+extends 'XML::XPathScript2::Stylesheet';
+
+our $master = XML::XPathScript2::Stylesheet->new;
+
+
+
+1;
