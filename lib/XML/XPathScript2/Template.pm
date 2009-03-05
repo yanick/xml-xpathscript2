@@ -29,7 +29,7 @@ sub safequote {
 }
 
 sub as_string {
-    my( $self, %arg ) = @_;
+    my ( $self, %arg ) = @_;
 
     my $code = $self->code;
 
@@ -46,25 +46,21 @@ END_CODE
     }
 
     if ( $arg{wrapper} eq 'sub' ) {
-        $code = 'sub { ' 
-              . 'my( $node, $stylesheet ) = @_;' 
-              . "\n"
-              . $code 
-              . '}';
+        $code =
+          'sub { ' . 'my( $node, $stylesheet ) = @_;' . "\n" . $code . '}';
     }
 
     return $code;
 }
 
 sub as_sub {
-    my( $self, %arg ) = @_;
+    my ( $self, %arg ) = @_;
 
     my $sub = eval $self->as_string( %arg, wrapper => 'sub' );
 
     die $@ if $@;
     return $sub;
 }
-
 
 1;
 
@@ -101,11 +97,33 @@ print_operator : '=' { $return = 'print' }
 
 simple_operator : print_operator | execute_operator
 
-if_operator : opening_code 'if' /^.+?(?=\s*-?%>)/ spaces(?) closing_code 
-                block(s?)  opening_code  '/if' closing_code {
+if_operator :   opening_code 
+                    'if' /^.+?(?=\s*-?%>)/ spaces(?) 
+                closing_code 
+                block(s?)  
+                opening_code  
+                    '/if' 
+                closing_code 
+                {
                     $return = $item[1] . 'if ( ' . $item[3] . ' ) { ' . ( join
                     '', @{$item[6]} ) . $item[7] . '}' ;
                 }
+
+set_token : 'set' | '@'
+
+set_operator : opening_code
+                    set_token spaces(?) /\S+/ spaces(?) /\S*/ spaces(?) 
+                closing_code 
+                block(s?)  
+                opening_code  
+                    '/' $item[2] 
+                closing_code 
+                {
+                    # FIXME BIG TIME
+                    $stylesheet->set( $item[4], { ( $item[6] || 'content' ) =>
+                    sub { blocks } }
+                }
+
 
 comment_keyword : '#' | 'comment'
 

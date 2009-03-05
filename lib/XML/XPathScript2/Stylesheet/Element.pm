@@ -15,7 +15,7 @@ Readonly our $DO_NOTHING   => 0;
 Readonly our $DO_SELF_ONLY => -1;
 Readonly our $DO_ALL       => 1;
 
-has showtag    => ( is => 'rw', default => 1 );
+has showtag => ( is => 'rw', default => 1 );
 has $_ => ( is => 'rw' ) for qw/
   pre post intro extro prechildren postchildren
   prechild postchild
@@ -44,12 +44,10 @@ has testcode => (
 
 before "set_$_" => sub {
     my ($self) = shift;
-    warn $self->_within_transformation;
     $self->detach_from_stylesheet if $self->_within_transformation;
   }
-  for
-  qw/ pre post intro extro prechildren postchildren 
-      prechild postchild insteadofchildren rename action testcode showtag /;
+  for qw/ pre post intro extro prechildren postchildren
+  prechild postchild insteadofchildren rename action testcode showtag /;
 
 sub type { 'element' }
 
@@ -110,7 +108,7 @@ sub transform {
 
     return $output;
 
-};
+}
 
 sub _transform_children {
     my ( $self, $action, $node, $args ) = @_;
@@ -143,7 +141,6 @@ sub _transform_children {
     return $output;
 
 }
-
 
 42;
 
